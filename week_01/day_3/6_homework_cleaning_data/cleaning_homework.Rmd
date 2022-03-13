@@ -34,6 +34,10 @@ After you've read in the data and assigned it to a variable with a useful name, 
 ```{r}
 movies_main <- read_csv('data/movies.csv')
 glimpse(movies_main)
+
+sum(is.na(movies_main))
+
+nrow(movies_main) - nrow(drop_na(movies_main))
 ```
 
 We could try sorting the movies by review score, also try removing some NA data found in various columns.
@@ -47,6 +51,13 @@ A lot of interesting stuff in there! But for now, we are only interested in the 
 
 ```{r}
 movies_selected <- select(movies_main, title, runtime, budget)
+```
+
+```{r}
+movies_main %>% 
+  mutate(title_match = original_title == title) %>% filter(title_match == FALSE)
+
+# checking which movies have the same title in English and original language
 ```
 
 
@@ -69,6 +80,25 @@ summarise(count = sum(is.na(budget)))
 ```
 
 Two missing values in runtime, none in title and budget.
+
+
+```{r}
+movies_selected %>% 
+  summarise(na_runtime = sum(is.na(runtime)),
+            na_title = sum(is.na(title)),
+            na_budget = sum(is.na(budget)))
+
+# summarise is creating a new table and you have to name the columns, na_runtime etc
+```
+
+
+# OR
+
+```{r}
+movies_selected %>% 
+  summarise(across(.cols = everything(), .fns = ~sum(is.na(.x))))
+```
+
 
 <br>
 
