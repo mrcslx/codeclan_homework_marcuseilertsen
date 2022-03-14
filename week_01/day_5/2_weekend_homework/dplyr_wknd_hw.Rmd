@@ -109,6 +109,14 @@ books %>%
   arrange(desc(books_published))
 ```
 
+John's example:
+
+```{r}
+books %>% 
+  count(publisher, sort = TRUE)
+```
+
+
 
 5. Ranking all books by rate of text reviews to numeric ratings.
 
@@ -116,7 +124,7 @@ books %>%
 books %>% 
   select(title, ratings_count, text_reviews_count) %>% 
   filter(ratings_count > 10) %>% 
-  mutate(text_rate = text_reviews_count /ratings_count) %>% 
+  mutate(text_rate = text_reviews_count / ratings_count) %>% 
   arrange(desc(text_rate))
 ```
 
@@ -130,5 +138,20 @@ books %>%
   group_by(authors) %>% 
   summarise(sum(num_pages)) %>% 
   arrange(desc(`sum(num_pages)`))
+```
+
+
+
+These are equivalent:
+
+```{r}
+books %>% 
+  count(language_code)
+```
+
+```{r}
+books %>%
+  group_by(language_code) %>% 
+  summarise(n = n())
 ```
 
