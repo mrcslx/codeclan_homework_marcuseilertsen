@@ -7,9 +7,9 @@
 SELECT 
     e.first_name,
     e.last_name,
-    t.name 
+    t.name AS team_name
 FROM employees AS e 
-RIGHT JOIN teams AS t 
+INNER JOIN teams AS t 
 ON e.team_id = t.id
 ORDER BY t.name, e.last_name, e.first_name;
 
@@ -21,9 +21,9 @@ SELECT
     e.first_name,
     e.last_name,
     e.pension_enrol,
-    t.name 
+    t.name AS team_name 
 FROM employees AS e 
-RIGHT JOIN teams AS t 
+INNER JOIN teams AS t 
 ON e.team_id = t.id 
 WHERE e.pension_enrol = TRUE
 ORDER BY t.name, e.last_name, e.first_name;
@@ -35,10 +35,10 @@ ORDER BY t.name, e.last_name, e.first_name;
 SELECT 
     e.first_name,
     e.last_name,
-    t.name,
+    t.name AS team_name,
     t.charge_cost 
 FROM employees AS e 
-RIGHT JOIN teams AS t 
+INNER JOIN teams AS t 
 ON e.team_id = t.id 
 WHERE cast(t.charge_cost AS int) > 80
 ORDER BY t.name, e.last_name, e.first_name;
@@ -110,7 +110,7 @@ FROM employees AS e
 LEFT JOIN teams AS t 
 ON e.team_id = t.id
 GROUP BY t.name
-ORDER BY count(e.id);
+ORDER BY employee_count;
 
 
 -- Question 4.
@@ -185,4 +185,5 @@ FROM employees AS e
 LEFT OUTER JOIN employees_committees AS ec 
 ON e.id = ec.employee_id 
 WHERE ec.employee_id IS NULL;
+
 
