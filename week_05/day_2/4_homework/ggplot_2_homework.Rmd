@@ -1,0 +1,216 @@
+---
+title: "Introduction to `ggplot2` homework"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+    pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
+```
+
+# Homework Info
+
+This homework recaps what you learnt in class today. 
+
+You'll be looking at the `backpack` dataset contained within the `CodeClanData` package using tidyverse. You'll need to load the appropriate packages first.In all plots you make, ensure your labels are appropriate 
+
+**You must write down a short summary of what each plot tells you in order to meet MVP.** Being an analyst is not just the ability to write code, you need to be able to interpret the visualisations and translate the relationships found (or not found) into plain language to explain to non-technical decision makers. Getting as much practice of this as you can while on this course is just (if not more!) important than the code!
+
+
+
+# MVP
+
+<br>
+
+**Question 1.**  
+
+Load in the libraries you need, and look at the `backpack` data. Take note of variable names and dimensions.
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+backpack <- CodeClanData::backpack
+```
+
+```{r}
+names(backpack)
+dim(backpack)
+```
+
+Variable names are:
+"backpack_weight", "body_weight", "ratio", "back_problems", "major", "year""sex", "status", "units"
+
+Dimensions are 9 columns and 100 rows.
+
+
+**Question 2.**
+
+What is the distribution of backpack weights that students are carrying? Choose an appropriate graph to show the distribution.
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = backpack_weight) +
+  geom_bar() +
+  labs(x = "\nBackpack weight (lbs)", 
+       y = "Count", 
+       title = "Number of backpacks per weight")
+```
+
+It seems that a majority of students carry a backpack weighing around 10 pounds.
+
+**Question 3.**  
+
+Are there differences in backpack weight between sex?
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = backpack_weight, group = sex, fill = sex) +
+  geom_histogram(position = "dodge") +
+  labs(x = "\nBackpack weight (lbs)", 
+       y = "Count", 
+       title = "Number of backpacks per weight", 
+       fill = "Gender")
+```
+
+It seems that men carry slightly heavier backpacks overall, but the distribution is still quite comparable.
+
+**Question 4.**  
+
+What is the relationship between body weight and backpack weight?
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = body_weight, y = backpack_weight) +
+  geom_point() +
+  labs(x = "\nBody weight (lbs)", 
+       y = "Backpack weight (lbs)", 
+       title = "Backpack weight in relation to body weight")
+```
+
+At first glance there doesn't appear to be a direct correlation between body weight and backpack weight, although it appears that the heaviest backpacks are carried by heavier individuals.
+
+**Question 5.**  
+
+Is this relationship different between men and women? Choose an appropriate plot and interpret your findings.
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = body_weight, y = backpack_weight, group = sex, colour = sex) +
+  geom_point() +
+  labs(x = "\nBody weight (lbs)", 
+       y = "Backpack weight (lbs)", 
+       title = "Backpack weight in relation to body weight", 
+       colour = "Gender")
+```
+
+Men are heavier than women on average which is not surprising, but again the backpack weights vary quite a bit and do not seem to depend on the person's body weight.
+
+**Question 6.**  
+
+What **proportion** of students report back pain?
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = as.logical(back_problems)) +
+  geom_bar() +
+  labs(x = "Back problems experienced", 
+       y = "Count", 
+       title = "Number of students who have/haven't experienced back problems")
+```
+
+Failed attempt:
+```{r}
+backpack %>% 
+  count(back_problems) %>% 
+  mutate(back_problems_perc = n / nrow(back_problems))
+
+ggplot(backpack) +
+  aes(x = )
+```
+
+It appears that approximately a third of students have experienced back problems.
+
+**Question 7.**  
+
+Is this proportion different between men and women? 
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = as.logical(back_problems), group = sex, fill = sex) +
+  geom_bar() +
+  labs(x = "Back problems experienced", 
+       y = "Count", 
+       fill = "Gender", 
+       title = "Number of students who have/haven't experienced back problems")
+```
+
+It appears that a higher proportion of women have experienced back problems.
+
+**Question 8.**  
+
+Now you've investigated your data separately, create plots to describe the relationship between backpack weight, body weight, gender and reported backpain.
+
+Try both `backpack_weight` and `body_weight` as well as the `ratio`.   
+
+*Hint: faceting would be useful here*.
+
+
+```{r}
+ggplot(backpack) +
+  aes(x = body_weight, y = backpack_weight, group = sex, colour = sex, 
+      shape = as.logical(back_problems)) +
+  geom_point() +
+  labs(x = "\nBody weight (lbs)", 
+       y = "Backpack weight (lbs)", 
+       title = "Backpack weight in relation to body weight", 
+       colour = "Gender", 
+       shape = "Back problems experienced")
+
+ggplot(backpack) +
+  aes(x = body_weight, y = backpack_weight, group = sex, colour = sex) +
+  geom_point() +
+  labs(x = "\nBody weight (lbs)", 
+       y = "Backpack weight (lbs)", 
+       title = "Backpack weight in relation to body weight", 
+       colour = "Gender") +
+  facet_wrap(~as.logical(back_problems), labeller = "label_both")
+
+ggplot(backpack) +
+  aes(x = as.logical(back_problems), y = ratio, group = sex, colour = sex) +
+  geom_point() +
+  labs(x = "\nBack problems experienced", 
+       y = "Backpack weight to body weight ratio", 
+       colour = "Gender")
+```
+
+Backpack weight to body weight ratio does not seem to be a deciding factor for back problems. Overall a higher percentage of women has experienced back pain, but it seems that the weight of their backpacks has little to do with it.
+
+# Extensions
+
+<br>
+
+**Question 1.** 
+
+Does reported backpain differ across the year groups? Ignore year 0 in your data.  
+
+
+**Question 2.** 
+
+Is there a difference between how heavy the bags those in different years carry?
+
+
