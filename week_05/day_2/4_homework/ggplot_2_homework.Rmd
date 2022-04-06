@@ -35,6 +35,7 @@ Load in the libraries you need, and look at the `backpack` data. Take note of va
 
 ```{r}
 library(tidyverse)
+library(scales)
 ```
 
 ```{r}
@@ -136,11 +137,31 @@ Failed attempt:
 ```{r}
 backpack %>% 
   count(back_problems) %>% 
-  mutate(back_problems_perc = n / nrow(back_problems))
-
-ggplot(backpack) +
-  aes(x = )
+  mutate(back_problems_perc = n / sum(n))
 ```
+
+
+Cam's pie chart:
+```{r}
+back_problems_summarise <- backpack %>% 
+  group_by(back_problems, sex) %>% # Variable to be transformed
+  count() %>% 
+  ungroup() %>% 
+  mutate(perc = `n` / sum(`n`)) %>% 
+  arrange(perc) %>%
+  mutate(labels = percent(perc))
+
+ggplot(back_problems_summarise) + 
+  aes(x = "", y = perc, fill = back_problems, colour = sex) +
+  geom_col(color = "white") +
+  geom_label(aes(label = paste(labels, sex)),
+             position = position_stack(vjust = 0.5),
+             show.legend = FALSE,
+             colour = "white") +
+  coord_polar(theta = "y") +
+  guides(fill = guide_legend(title = "Do you suffer from back problems?"))
+```
+
 
 It appears that approximately a third of students have experienced back problems.
 
