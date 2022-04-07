@@ -1,7 +1,6 @@
 library(shiny)
 library(tidyverse)
 library(shinythemes)
-library(bslib)
 
 whisky <- CodeClanData::whisky
 all_whiskies <- unique(whisky$Distillery)
@@ -10,7 +9,7 @@ ui <- fluidPage(
   
   theme = shinytheme("united"),
   
-  titlePanel(tags$h1("🤤 Whisky Profiler 🤤")),
+  titlePanel(tags$h1("🤤 Scotch Whisky Profiler 🤤")),
   
   HTML("<br><br>"),
   
@@ -58,7 +57,7 @@ server <- function(input, output) {
                                    "Winey" = "#631034")) +
       labs(x = "\nIntensity") +
       theme_minimal() +
-      theme(axis.text = element_text(size = 18),
+      theme(axis.text = element_text(size = 17),
             axis.title.x = element_text(size = 16),
             axis.title.y = element_text(size = 0),
             legend.position="none")
