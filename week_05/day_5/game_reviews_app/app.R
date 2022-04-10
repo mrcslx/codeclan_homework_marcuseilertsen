@@ -43,13 +43,18 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
+  filtered_games <- reactive({
+    games %>% 
+      filter(platform %in% input$platform_input) %>% 
+      select(-c(sales, rating, platform)) %>% 
+      filter(genre %in% input$genre_input) %>%
+      filter(year_of_release %in% seq(input$year_input[1], input$year_input[2], 
+                                      by = 1))
+  })
+  
   output$critic_ratings_plot <- renderPlot({
     
-    games %>% 
-      filter(genre %in% input$genre_input, 
-             year_of_release %in% seq(input$year_input[1], input$year_input[2], by = 1), 
-             platform == input$platform_input) %>% 
-      select(name, critic_score) %>% 
+    filtered_games() %>%
       arrange(desc(critic_score)) %>% 
       tail(10) %>% 
       ggplot() +
@@ -68,11 +73,7 @@ server <- function(input, output) {
   
   output$user_ratings_plot <- renderPlot({
     
-    games %>% 
-      filter(genre %in% input$genre_input, 
-             year_of_release %in% seq(input$year_input[1], input$year_input[2], by = 1), 
-             platform == input$platform_input) %>% 
-      select(name, user_score) %>% 
+    filtered_games() %>%
       arrange(desc(user_score)) %>% 
       tail(10) %>% 
       ggplot() +
