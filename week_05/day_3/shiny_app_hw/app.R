@@ -60,7 +60,7 @@ server <- function(input, output) {
       theme(axis.text = element_text(size = 17),
             axis.title.x = element_text(size = 16),
             axis.title.y = element_text(size = 0),
-            legend.position="none")
+            legend.position = "none")
     
   })
   
