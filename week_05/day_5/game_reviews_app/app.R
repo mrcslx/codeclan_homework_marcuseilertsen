@@ -23,13 +23,13 @@ ui <- fluidPage(
       
       checkboxGroupInput("platform_input", label = h4("Platform"), 
                          choices = all_platforms,
-                         selected = 1),
+                         selected = 1)
       
     ),
     
     mainPanel(
       tabsetPanel(
-        tabPanel("Highest reviewed games", plotOutput("plot")), 
+        tabPanel("Highest reviewed games", plotOutput("critic_ratings_plot")), 
         tabPanel("Summary", verbatimTextOutput("summary")), 
         tabPanel("Table view", tableOutput("table"))
       )
@@ -38,6 +38,23 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+  
+  output$critic_ratings_plot <- renderPlot({
+    
+    games %>% 
+      filter(genre == "genre_input", year_of_release == "year_input", 
+             platform == "platform_input") %>% 
+      select(name, critic_score) %>% 
+      arrange(desc(critic_score)) %>% 
+      head(10) %>% 
+      ggplot() +
+      aes(x = critic_score, y = reorder(name, critic_score)) +
+      geom_col(fill = "aquamarine") +
+      labs(x = "\nCritic score",
+           y = "Game title",
+           title = "Top games by critic score")
+    
+  })
   
 }
 
