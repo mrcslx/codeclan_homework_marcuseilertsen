@@ -1,0 +1,100 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Question
+Calculate the conditional probabilities prob(survived∣crew) and prob(survived∣passenger) to settle this dispute.
+
+Have a look at the distinct values of the class variable, this will tell you whether each individual was a passenger (1st, 2nd or 3rd class) or a member of the crew (treat restaurant staff as crew)
+
+
+```{r}
+library(prob)
+library(gtools)
+library(tidyverse)
+```
+
+```{r}
+titanic <- read_csv("data/titanic.csv")
+```
+
+```{r}
+titanic <- titanic %>% 
+  mutate(crew = !(class %in% c("1st", "2nd", "3rd")))
+```
+
+```{r}
+table(titanic["survived"])
+```
+
+```{r}
+titanic %>% 
+  filter(crew == TRUE) %>% 
+  summarise(prob_survived_crew = sum(survived == "yes") / n())
+```
+
+```{r}
+titanic %>% 
+  filter(crew == FALSE) %>% 
+  summarise(prob_survived_passenger = sum(survived == "yes") / n())
+```
+
+It seems that passengers were more likely to survive than crew members.
+
+
+
+Question 1.
+If I roll a six-sided dice once, what is the probability of getting a number less than 5?
+
+```{r}
+s_one_die <- rolldie(1)
+
+s_one_die %>% 
+  filter(X1 < 5) %>% 
+  summarise(prob = n() / nrow(s_one_die))
+```
+
+
+Question 2.
+How many outcomes are there in the sample space of an experiment in which we toss three dice?
+
+```{r}
+rolldie(3)
+```
+
+There are 216 different outcomes.
+
+
+Question 4.
+Five chairs are placed in a row in a room, along with five people of differing height. The people sit down randomly on the chairs. What is the probability that they sit in order of decreasing height, left to right?
+
+```{r}
+five_five <- permutations(5, 5)
+
+1 / nrow(five_five)
+```
+
+There is only one permutation out of 120 which meets the criteria.
+
+
+Question 5.
+I roll six dice:
+
+what is the probability I see the numbers 6, 5, 4, 3, 2 and 1 in order on the dice, left to right?
+what is the probability I see one each of the numbers 6, 5, 4, 3, 2 and 1 on the dice regardless of order?
+
+```{r}
+options(scipen = 4)
+
+s_six_dice <- rolldie(6)
+
+s_six_dice %>% 
+  filter(isin(., c(6, 5, 4, 3, 2, 1), ordered = TRUE)) %>% 
+  summarise(prob_ordered = n() / nrow(s_six_dice))
+
+s_six_dice %>% 
+  filter(isin(., c(6, 5, 4, 3, 2, 1), ordered = FALSE)) %>% 
+  summarise(prob_not_ordered = n() / nrow(s_six_dice))
+```
