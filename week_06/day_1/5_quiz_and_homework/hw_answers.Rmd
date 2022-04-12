@@ -27,6 +27,9 @@ titanic <- titanic %>%
 
 ```{r}
 table(titanic["survived"])
+
+titanic %>% 
+  count(survived)
 ```
 
 ```{r}
@@ -39,6 +42,13 @@ titanic %>%
 titanic %>% 
   filter(crew == FALSE) %>% 
   summarise(prob_survived_passenger = sum(survived == "yes") / n())
+```
+
+Or using `group_by`:
+```{r}
+titanic %>% 
+  group_by(crew) %>% 
+  summarise(prob_survived = sum(survived == "yes") / n())
 ```
 
 It seems that passengers were more likely to survive than crew members.
