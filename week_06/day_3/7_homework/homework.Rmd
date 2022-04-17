@@ -72,6 +72,9 @@ infer_ames_resample %>%
   aes(x = stat) +
   geom_histogram(col = "white", fill = "orange", alpha = 0.7) +
   labs(x = "mean(lot_area)")
+
+infer_ames_resample %>% 
+  visualise(bins = 30)
 ```
 
 
