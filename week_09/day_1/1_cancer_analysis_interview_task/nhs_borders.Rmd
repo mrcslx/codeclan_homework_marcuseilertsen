@@ -1,0 +1,112 @@
+---
+title: "NHS Borders Cancer Rates"
+output: html_notebook
+author: "Marcus Eilertsen"
+date: "02/05/2022"
+---
+
+
+1 Question:
+Please prepare a 1 to 2 page analysis summary answering the question below.
+
+In order to help inform the planning for provision of cancer treatment services in NHS Borders, we would like to gain better understanding of the incidence of cancer in NHS Borders.
+
+You will present your findings back to us during the Mock Interviews. Presentations will be 5 minutes long.
+
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+health_boards <- read_csv(here::here("raw_data/geography_codes_and_labels_hb2014_01042019.csv")) %>% 
+  clean_names()
+cancer_incidence <- read_csv(here::here("raw_data/cancer_incidence_by_health_board.csv")) %>% 
+  clean_names()
+five_year_summary <- read_csv(here::here("raw_data/5_year_summary_of_incidence_by_health_board.csv")) %>% 
+  clean_names()
+```
+
+```{r}
+cancer_incidence_borders <- cancer_incidence %>% 
+  filter(hb == "S08000016")
+five_year_summary_borders <- five_year_summary %>% 
+  filter(hb == "S08000016")
+
+rm(cancer_incidence)
+rm(five_year_summary)
+```
+
+```{r}
+cancer_incidence_borders %>% 
+  filter(cancer_site == "All cancer types", sex != "All") %>% 
+  ggplot() +
+    aes(x = year, y = incidences_all_ages, fill = sex) +
+  scale_fill_manual(name = "Gender", 
+                    values = c("Male" = "blue", 
+                               "Female" = "red")) +
+  geom_col() +
+  geom_text(aes(label = incidences_all_ages), vjust = 2, colour = "white", size = 5) +
+  labs(x = "\nYear",
+       y = "Total number of incidences\n",
+       title = "Total number of cancer incidences per year") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12), 
+        legend.position = "none")
+```
+
+```{r}
+highest_inc_cancer_types <- cancer_incidence_borders %>% 
+  filter(cancer_site != "All cancer types", sex == "All", year == 2020) %>% 
+  select(cancer_site, incidences_all_ages) %>% 
+  slice_max(incidences_all_ages, n = 5)
+```
+
+```{r}
+cancer_incidence_borders %>% 
+  filter(cancer_site %in% highest_inc_cancer_types$cancer_site, sex == "All") %>% 
+  group_by(cancer_site) %>% 
+  ggplot() +
+    aes(x = year, y = incidences_all_ages, colour = cancer_site) +
+  scale_fill_manual(name = "Gender", 
+                    values = c("Male" = "blue", 
+                               "Female" = "red")) +
+  geom_line() +
+  labs(y = "Number of incidences",
+       title = "Total number of cancer incidences per year and cancer type", 
+       colour = "Cancer site") +
+  theme_light() +
+  theme(title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size = 12))
+```
+
+```{r}
+five_year_summary_borders %>% 
+  filter(cancer_site == "All cancer types", sex == "All") %>% 
+  select(c(8:25)) %>% 
+  pivot_longer(cols = everything(), names_to = "age_range", values_to = "incidences") %>% 
+  mutate(age_range = str_replace(age_range, "incidences_age", "")) %>% 
+  mutate(age_range = str_replace(age_range, "to", " to ")) %>% 
+  mutate(age_range = str_replace(age_range, "_under5", "under 5")) %>% 
+  mutate(age_range = str_replace(age_range, "85and_over", "85 and over")) %>% 
+  ggplot() +
+  aes(x = incidences, y = reorder(age_range, incidences)) +
+  geom_col()
+```
+
+```{r}
+five_year_summary_borders %>% 
+  filter(cancer_site != "All cancer types", sex == "All") %>% 
+  select(cancer_site, incidences_age70to74) %>% 
+  slice_max(incidences_age70to74, n = 10) %>% 
+  ggplot() +
+  aes(x = incidences_age70to74, y = reorder(cancer_site, incidences_age70to74)) +
+  geom_col()
+```
+

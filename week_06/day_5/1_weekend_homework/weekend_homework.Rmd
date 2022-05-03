@@ -61,9 +61,16 @@ null_distribution <- msleep %>%
 ```
 
 ```{r}
-obs_stat <- null_distribution %>% 
-  summarise(mean(stat))
+obs_stat <- msleep %>% 
+  summarise(mean(sleep_total))
 ```
+
+```{r}
+msleep %>%
+  specify(response = sleep_total) %>%
+  calculate(stat = "mean")
+```
+
 
 ```{r}
 null_distribution %>% 
