@@ -1,0 +1,90 @@
+---
+title: "Text Mining Homework"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE, fig.align = "center", message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidytext)
+library(tidyverse)
+library(janeaustenr)
+```
+
+# MVP
+
+Using the dataset `austen_books()` from the package `janeaustenr`:
+
+1. Find the most common words in both Pride & Prejudice and Sense & Sensibility.
+
+```{r}
+austen_books <- austen_books()
+```
+
+```{r}
+pride <- austen_books %>% 
+  filter(book == "Pride & Prejudice") %>% 
+  select(text) %>% 
+  unnest_tokens(word, text)
+
+sense <- austen_books %>% 
+  filter(book == "Sense & Sensibility") %>% 
+  select(text) %>% 
+  unnest_tokens(word, text)
+```
+
+```{r}
+pride %>% 
+  count(word, sort = TRUE)
+
+sense %>% 
+  count(word, sort = TRUE)
+```
+
+2. Find the most common words in both Pride & Prejudice and Sense & Sensibility, not including stop words.
+
+```{r}
+pride %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+
+sense %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+```
+
+3. Find the most common sentiment words in both Pride & Prejudice and Sense & Sensibility.
+
+```{r}
+pride %>%
+  inner_join(get_sentiments("bing")) %>% 
+  count(word, sort = TRUE)
+
+sense %>%
+  inner_join(get_sentiments("bing")) %>% 
+  count(word, sort = TRUE)
+```
+
+# Extension
+
+Taking your results above. Can you create a plot which visualises the differences between the books?  
+
+```{r}
+pride %>%
+  inner_join(get_sentiments("afinn")) %>% 
+  summarise(mean(value))
+
+sense %>%
+  inner_join(get_sentiments("afinn")) %>% 
+  summarise(mean(value))
+```
+
